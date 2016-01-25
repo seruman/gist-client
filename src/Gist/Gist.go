@@ -1,5 +1,8 @@
 package Gist
 
+import "io/ioutil"
+import "path/filepath"
+
 type File struct {
 	Content string `json:"content"`
 }
@@ -15,6 +18,14 @@ func Create(desc string, public bool) Snippet {
 	return s
 }
 
-func (s *Snippet) AddFile(filename string, content string) {
-	s.Files[filename] = File{Content: content}
+func (s *Snippet) AddFile(filename string) {
+	content, err := ioutil.ReadFile(filename)
+	d := filepath.Base(filename)
+	check(err)
+	s.Files[d] = File{Content: string(content)}
+}
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
 }
