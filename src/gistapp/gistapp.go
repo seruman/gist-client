@@ -11,41 +11,57 @@ import (
 )
 
 const url = "https://api.github.com/gists"
-const username = "seruman"
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
 
 func main() {
-	aToken := os.Getenv("token")
-
-	argsWithProg := os.Args
-	fmt.Println(argsWithProg)
-	//data, err := ioutil.ReadFile(argsWithProg[1])
-
+	aToken := os.Getenv("GH_TOKEN")
 	b := Gist.Create("aciklama", false)
-	b.AddFile(argsWithProg[1])
-	//b.AddFile(argsWithProg[2])
+
+	args := os.Args[1:]
+
+	if len(args) < 1 {
+		fmt.Fprintf(os.Stderr, "error: No input file(s)\n")
+		os.Exit(64)
+	}
+
+	for index := 0; index < len(args); index++ {
+		err := b.AddFile(args[index])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(66)
+		}
+	}
 
 	parsed, _ := json.Marshal(b)
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, bytes.NewReader(parsed))
 
-	check(err)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "token "+aToken)
 
 	resp, err := client.Do(req)
 
-	check(err)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
 
-	contents, err := ioutil.ReadAll(resp.Body)
-	check(err)
+	if resp.StatusCode != 201 {
+		fail := Gist.Fail{}
+		content, _ := ioutil.ReadAll(resp.Body)
+		json.Unmarshal(content, &fail)
 
-	fmt.Println(string(contents))
+		fmt.Fprint(os.Stderr, "Github: ", fail.Message, "\n")
+	}
+
+	// _, err := ioutil.ReadAll(resp.Body) // just in case
+	// if err != nil {
+	// 	fmt.Fprintf(os.Stderr, "error: %v\n", err)
+	// 	os.Exit(1)
+	// }
 
 }

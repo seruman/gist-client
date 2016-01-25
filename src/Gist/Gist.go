@@ -13,19 +13,25 @@ type Snippet struct {
 	Files       map[string]File `json:"files"`
 }
 
+type Fail struct {
+	Message string
+}
+
+type Success struct {
+}
+
 func Create(desc string, public bool) Snippet {
 	s := Snippet{Description: desc, Public: public, Files: map[string]File{}}
 	return s
 }
 
-func (s *Snippet) AddFile(filename string) {
+func (s *Snippet) AddFile(filename string) error {
 	content, err := ioutil.ReadFile(filename)
-	d := filepath.Base(filename)
-	check(err)
-	s.Files[d] = File{Content: string(content)}
-}
-func check(e error) {
-	if e != nil {
-		panic(e)
+	if err != nil {
+		return err
 	}
+	d := filepath.Base(filename)
+	s.Files[d] = File{Content: string(content)}
+
+	return nil
 }
