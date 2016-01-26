@@ -1,7 +1,9 @@
-package Snippet
+package snippet
 
-import "io/ioutil"
-import "path/filepath"
+import (
+	"io/ioutil"
+	"path/filepath"
+)
 
 type File struct {
 	Content string `json:"content"`
@@ -11,10 +13,6 @@ type Snippet struct {
 	Description string          `json:"description"`
 	Public      bool            `json:"public"`
 	Files       map[string]File `json:"files"`
-}
-
-type Fail struct {
-	Message string
 }
 
 type Success struct {
