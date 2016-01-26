@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Gist"
+	"Snippet"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -14,7 +14,7 @@ const url = "https://api.github.com/gists"
 
 func main() {
 	aToken := os.Getenv("GH_TOKEN")
-	b := Gist.Create("aciklama", false)
+	b := Snippet.Create("aciklama", false)
 
 	args := os.Args[1:]
 
@@ -51,17 +51,19 @@ func main() {
 	}
 
 	if resp.StatusCode != 201 {
-		fail := Gist.Fail{}
+		fail := Snippet.Fail{}
 		content, _ := ioutil.ReadAll(resp.Body)
 		json.Unmarshal(content, &fail)
 
 		fmt.Fprint(os.Stderr, "Github: ", fail.Message, "\n")
 	}
 
-	// _, err := ioutil.ReadAll(resp.Body) // just in case
-	// if err != nil {
-	// 	fmt.Fprintf(os.Stderr, "error: %v\n", err)
-	// 	os.Exit(1)
-	// }
+	data, err := ioutil.ReadAll(resp.Body) // just in case
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println(string(data))
 
 }

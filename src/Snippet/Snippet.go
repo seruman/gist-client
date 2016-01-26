@@ -1,4 +1,4 @@
-package Gist
+package Snippet
 
 import "io/ioutil"
 import "path/filepath"
