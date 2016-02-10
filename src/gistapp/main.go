@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"gist"
 	"io/ioutil"
@@ -15,11 +16,16 @@ import (
 const url = "https://api.github.com/gists"
 
 func main() {
+	description := flag.String("d", "", "Description, empty if not given.")
+	public := flag.Bool("v", false, "Visibility, false if not given")
+
+	flag.Parse()
+
 	aToken := os.Getenv("GH_TOKEN") // Github Access Token
 	//gKey := os.Getenv("GOOGL_API_KEY") // API key for Google Url Shortener
-	b := snippet.Create("aciklama", false)
+	b := snippet.Create(*description, *public)
 
-	args := os.Args[1:]
+	args := flag.Args()
 
 	if len(args) < 1 {
 		fmt.Fprintf(os.Stderr, "error: No input file(s)\n")
